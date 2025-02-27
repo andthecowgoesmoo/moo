@@ -9,6 +9,7 @@
 
     <script>
         function getLocation() {
+            document.getElementById("location").textContent = "Getting location...";
             if (navigator.geolocation) {
                 const options = {
                     enableHighAccuracy: true,
@@ -17,54 +18,32 @@
                 };
                 navigator.geolocation.getCurrentPosition(showPosition, handleError, options);
             } else {
-                sendLocationUpdate("Geolocation is not supported by this browser.");
+                document.getElementById("location").textContent = "Geolocation is not supported by this browser.";
             }
         }
 
         function showPosition(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            sendLocationUpdate(null, lat, lon);
+            document.getElementById("location").textContent = `Latitude: ${lat}, Longitude: ${lon}`;
         }
 
         function handleError(error) {
-            let errorMessage = '';
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMessage = "User denied the request for Geolocation.";
+                    document.getElementById("location").textContent = "User denied the request for Geolocation.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    errorMessage = "Location information is unavailable.";
+                    document.getElementById("location").textContent = "Location information is unavailable.";
                     break;
                 case error.TIMEOUT:
-                    errorMessage = "The request to get user location timed out.";
+                    document.getElementById("location").textContent = "The request to get user location timed out.";
                     break;
                 case error.UNKNOWN_ERROR:
-                    errorMessage = "An unknown error occurred.";
+                    document.getElementById("location").textContent = "An unknown error occurred.";
                     break;
             }
-            sendLocationUpdate(errorMessage);
         }
-        
-        function sendLocationUpdate(errorMessage = null, latitude = null, longitude = null) {
-            window.parent.postMessage({
-                type: 'locationUpdate',
-                error: errorMessage,
-                latitude: latitude,
-                longitude: longitude
-            }, '*'); // '*'' is used here for simplicity; ideally, it should be restricted to the parent domain.
-        }
-
-        window.addEventListener('message', function(event) {
-            if (event.origin !== 'https://smokestore.shop/') {
-                return; // Ignore messages from other origins
-            }
-
-            // Check for requests from the parent window to get location
-            if (event.data === 'getLocation') {
-                getLocation();
-            }
-        });
     </script>
 </body>
 </html>
