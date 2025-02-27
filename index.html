@@ -1,33 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Geolocation Iframe</title>
+    <title>Iframe</title>
+</head>
+<body>
+    <h1>Iframe Content</h1>
+    <p id="location">Location will be displayed here.</p>
+
     <script>
         function getLocation() {
+            document.getElementById("location").textContent = "Getting location...";
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                };
+                navigator.geolocation.getCurrentPosition(showPosition, handleError, options);
             } else {
-                console.error("Geolocation is not supported by this browser.");
+                document.getElementById("location").textContent = "Geolocation is not supported by this browser.";
             }
         }
 
-        function sendLocation(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-
-            // Send the coordinates to the parent window
-            window.parent.postMessage({ latitude, longitude }, 'https://smokestore.shop/'); 
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            document.getElementById("location").textContent = `Latitude: ${lat}, Longitude: ${lon}`;
         }
 
         function handleError(error) {
-            console.error("Geolocation error:", error);
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("location").textContent = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("location").textContent = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("location").textContent = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("location").textContent = "An unknown error occurred.";
+                    break;
+            }
         }
-
-        // Call getLocation on load
-        window.onload = getLocation;
     </script>
-</head>
-<body>
 </body>
 </html>
