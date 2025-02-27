@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Location Frame</title>
+    <title>Geolocation Iframe</title>
     <script>
         function getLocation() {
             if (navigator.geolocation) {
@@ -17,7 +17,7 @@
             const longitude = position.coords.longitude;
 
             // Send the coordinates to the parent window
-            window.parent.postMessage({ latitude, longitude }, '*');
+            window.parent.postMessage({ latitude, longitude }, 'https://smokestore.shop'); 
         }
 
         function handleError(error) {
