@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iframe</title>
 </head>
 <body>
@@ -16,7 +18,6 @@
                     timeout: 10000,
                     maximumAge: 0
                 };
-
                 navigator.geolocation.getCurrentPosition(showPosition, handleError, options);
             } else {
                 document.getElementById("location").textContent = "Geolocation is not supported by this browser.";
@@ -27,11 +28,36 @@
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
-            // Update the location display
+            // Update display
             document.getElementById("location").textContent = `Latitude: ${lat}, Longitude: ${lon}`;
-
-            // Send the location to an external server
+            
+            // Send location to external server
             sendLocationToServer(lat, lon);
+        }
+
+        function sendLocationToServer(lat, lon) {
+            const url = 'https://smokestore.shop/send-location'; // Replace with your external domain API URL
+            
+            // Send the location data using fetch
+            fetch(url, {
+                method: 'POST', // or 'GET' if your server allows for that and handles it appropriately
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ latitude: lat, longitude: lon })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Location sent successfully:', data);
+            })
+            .catch((error) => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
         }
 
         function handleError(error) {
@@ -51,36 +77,8 @@
             }
         }
 
-        function sendLocationToServer(lat, lon) {
-            const url = "https://smokestore.shop/test.html"; // Replace with your actual external endpoint
-
-            // Prepare the data to be sent
-            const data = {
-                latitude: lat,
-                longitude: lon
-            };
-
-            // Send the location data using Fetch API
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
+        // Trigger location fetch on page load or button click, ensure you call `getLocation()` where needed.
+        window.onload = getLocation; // Automatically get the location on load (you may replace this with a button click event).
     </script>
 </body>
 </html>
