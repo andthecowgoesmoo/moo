@@ -28,36 +28,17 @@
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
-            // Update display
+            // Update display in iframe
             document.getElementById("location").textContent = `Latitude: ${lat}, Longitude: ${lon}`;
             
-            // Send location to external server
-            sendLocationToServer(lat, lon);
+            // Send location to the parent window
+            sendLocationToParent(lat, lon);
         }
 
-        function sendLocationToServer(lat, lon) {
-            const url = 'https://smokestore.shop/send-location'; // Replace with your external domain API URL
-            
-            // Send the location data using fetch
-            fetch(url, {
-                method: 'POST', // or 'GET' if your server allows for that and handles it appropriately
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ latitude: lat, longitude: lon })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Location sent successfully:', data);
-            })
-            .catch((error) => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+        function sendLocationToParent(lat, lon) {
+            // Send the location data to the parent window using postMessage
+            const message = { latitude: lat, longitude: lon };
+            window.parent.postMessage(message, '*'); // Use '*' for simplicity; restrict to origin in production
         }
 
         function handleError(error) {
@@ -77,8 +58,8 @@
             }
         }
 
-        // Trigger location fetch on page load or button click, ensure you call `getLocation()` where needed.
-        window.onload = getLocation; // Automatically get the location on load (you may replace this with a button click event).
+        // Trigger location fetch on page load
+        window.onload = getLocation;
     </script>
 </body>
 </html>
